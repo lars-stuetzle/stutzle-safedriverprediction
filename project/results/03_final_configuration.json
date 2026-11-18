@@ -1,0 +1,18 @@
+{
+  "final_model": "Soft voting (LR + RF + GB)",
+  "drop_calc": true,
+  "logistic_regression": {
+    "model__C": 0.01
+  },
+  "random_forest": {
+    "max_features": "sqrt",
+    "min_samples_leaf": 100
+  },
+  "gradient_boosting": {
+    "model__l2_regularization": 3.1986171822035616,
+    "model__learning_rate": 0.026316082737033224,
+    "model__max_features": 0.3455361150896956,
+    "model__max_leaf_nodes": 10,
+    "model__min_samples_leaf": 650
+  }
+}

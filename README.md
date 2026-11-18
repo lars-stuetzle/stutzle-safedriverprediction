@@ -37,7 +37,7 @@ held-out test part (used once, for the final evaluation).
 |---|---|---|
 | Data understanding (EDA) | `project/notebooks/01_eda.ipynb` | done |
 | Data preparation, evaluation protocol, baseline | `project/notebooks/02_preparation.ipynb` | done |
-| Modelling and model selection | `project/notebooks/03_modeling.ipynb` | to do |
+| Modelling and model selection | `project/notebooks/03_modeling.ipynb` | done |
 | Final evaluation on the test part | `project/notebooks/04_evaluation.ipynb` | to do |
 | Presentation (LaTeX Beamer) | `doc/` | to do |
 
@@ -60,16 +60,34 @@ held-out test part (used once, for the final evaluation).
 - Tree models: no imputation, scaling or encoding needed (native missing-value and categorical support).
 - All preparation steps are inside scikit-learn pipelines, refitted in every cross-validation fold (no leakage).
 
+**Modelling** (notebook 03)
+- The 20 `calc` features were tested by ablation: removing them changes the Gini by less than 0.001, so they
+  are dropped (37 features remain).
+- Logistic regression does not overfit (train and CV Gini differ by about 0.01); it is limited by bias.
+- A single decision tree overfits strongly with depth; Naive Bayes and an MLP do not beat logistic regression.
+- The ensembles are best: random forest (tuned with the out-of-bag estimate) and gradient boosting (randomized
+  search, overfitting reduced from train Gini 0.41 to 0.36).
+- Balanced class weights and a "number of missing values" feature brought no improvement.
+- **Final model:** soft voting of the tuned logistic regression, random forest and gradient boosting.
+
 **Model comparison** (5-fold stratified CV on the training part, mean ± std over the folds)
 
 | Model | CV Gini | CV PR-AUC | Train Gini |
 |---|---|---|---|
-| Dummy (constant claim rate) | 0.000 | 0.036 | 0.000 |
+| **Soft voting (LR + RF + GB)** | **0.274 ± 0.008** | **0.066** | 0.376 |
+| Random forest (tuned) | 0.270 ± 0.008 | 0.064 | 0.460 |
+| Histogram gradient boosting (tuned) | 0.266 ± 0.010 | 0.065 | 0.359 |
+| Logistic regression (tuned, `C = 0.01`) | 0.259 ± 0.005 | 0.063 | 0.269 |
+| MLP (32 hidden units) | 0.257 ± 0.015 | 0.062 | 0.283 |
 | Logistic regression (default) | 0.257 ± 0.006 | 0.064 | 0.272 |
 | Histogram gradient boosting (default) | 0.253 ± 0.010 | 0.062 | 0.407 |
-| _tuned and further models: notebook 03_ | | | |
+| Decision tree (tuned) | 0.217 ± 0.010 | 0.056 | 0.292 |
+| Gaussian Naive Bayes | 0.179 ± 0.007 | 0.049 | 0.196 |
+| Dummy (constant claim rate) | 0.000 | 0.036 | 0.000 |
 
-For reference, the best Kaggle solutions reached a Gini of about 0.29 on the competition test set.
+The scores of tuned models are slightly optimistic (the same folds chose the hyperparameters); the unbiased
+estimate comes from the held-out test part in notebook 04. For reference, the best Kaggle solutions reached a
+Gini of about 0.29 on the competition test set (different data, so not directly comparable).
 
 ## Repository structure
 
@@ -80,8 +98,9 @@ stutzle-safedriverprediction/
 │   ├── README.md          description, prerequisites, installation and startup
 │   ├── requirements.txt
 │   ├── Data/              train.csv goes here (not in the repository, see Data/README.md)
-│   ├── src/               shared code: data_utils.py (loading, split), preprocessing.py (pipelines)
-│   ├── notebooks/         01_eda, 02_preparation, ... (+ PDF exports)
+│   ├── src/               shared code: data_utils.py (loading, split), preprocessing.py (pipelines),
+│   │                      evaluation.py (cross-validation protocol)
+│   ├── notebooks/         01_eda, 02_preparation, 03_modeling, ... (+ PDF exports)
 │   └── results/           tables and figures produced by the notebooks
 └── doc/                   Beamer presentation (.tex and .pdf)
 ```

@@ -34,7 +34,17 @@ def select_columns(columns, drop_calc=False, drop_columns=()):
             for kind, cols in groups.items() if kind != "calc"}
 
 
-def make_linear_preprocessor(columns, drop_calc=False, min_category_count=MIN_CATEGORY_COUNT):
+def add_missing_count(features):
+    """Feature engineering: add the number of missing values per row as a new column 'n_missing'.
+
+    Computed row by row, so it uses no information from other rows (no leakage).
+    """
+    extended = features.copy()
+    extended["n_missing"] = features.isna().sum(axis=1)
+    return extended
+
+
+def make_linear_preprocessor(columns, drop_calc=False, min_category_count=MIN_CATEGORY_COUNT, sparse=True):
     """Preparation for linear and distance-based models.
 
     - numeric: median imputation plus a 0/1 "was missing" indicator (missingness is informative),
@@ -44,6 +54,8 @@ def make_linear_preprocessor(columns, drop_calc=False, min_category_count=MIN_CA
       are mapped to the infrequent group;
     - binary: no missing values, already 0/1, passed through unchanged;
     - ps_ind_14 is dropped (perfect multicollinearity), and optionally the calc features.
+
+    sparse=False returns a dense array, for models that do not accept sparse input (e.g. Gaussian Naive Bayes).
     """
     selected = select_columns(columns, drop_calc=drop_calc, drop_columns=REDUNDANT_FOR_LINEAR)
 
@@ -54,15 +66,15 @@ def make_linear_preprocessor(columns, drop_calc=False, min_category_count=MIN_CA
     categorical_steps = Pipeline([
         ("impute", SimpleImputer(strategy="constant", fill_value=MISSING_CATEGORY)),
         ("one_hot", OneHotEncoder(min_frequency=min_category_count,
-                                  handle_unknown="infrequent_if_exist")),
+                                  handle_unknown="infrequent_if_exist", sparse_output=sparse)),
     ])
-    # the output is a sparse matrix (about 25% non-zero values): 3x less memory than a dense array,
-    # which matters when the 5 cross-validation folds run in parallel
+    # by default the output is a sparse matrix (about 20% non-zero values): much less memory than a dense
+    # array, which matters when the 5 cross-validation folds run in parallel
     return ColumnTransformer([
         ("numeric", numeric_steps, selected["numeric"]),
         ("categorical", categorical_steps, selected["categorical"]),
         ("binary", "passthrough", selected["binary"]),
-    ], remainder="drop", sparse_threshold=0.3, verbose_feature_names_out=False)
+    ], remainder="drop", sparse_threshold=0.3 if sparse else 0.0, verbose_feature_names_out=False)
 
 
 def make_tree_preprocessor(columns, drop_calc=False):

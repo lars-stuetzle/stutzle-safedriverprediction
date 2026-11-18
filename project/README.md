@@ -11,10 +11,12 @@ See the [main README](../README.md) for objectives and results.
 |---|---|
 | `notebooks/01_eda.ipynb` | Exploratory data analysis and EDA log |
 | `notebooks/02_preparation.ipynb` | Preprocessing pipelines, cross-validation protocol, dummy baseline |
+| `notebooks/03_modeling.ipynb` | Comparison and tuning of the classifiers, choice of the final model |
 | `src/data_utils.py` | Shared functions: load `train.csv`, recode `-1` as missing, stratified 80/20 split, feature groups |
 | `src/preprocessing.py` | Preprocessing pipelines for linear models and for tree models |
+| `src/evaluation.py` | Shared evaluation protocol: stratified 5-fold CV, Gini and PR-AUC |
 | `Data/` | Place for `train.csv` (not stored in the repository, see below) |
-| `results/` | Tables and figures written by the notebooks (e.g. `02_first_models_cv.csv`) |
+| `results/` | Tables, figures and the chosen model configuration written by the notebooks (e.g. `03_final_configuration.json`) |
 | `requirements.txt` | Python packages with the tested versions |
 
 Each notebook starts with a numbered workflow; its sections and code comments use the same numbers.
@@ -66,5 +68,13 @@ To execute a notebook from the command line instead:
 jupyter nbconvert --to notebook --execute --inplace notebooks/01_eda.ipynb
 ```
 
-On a laptop (8 cores, 16 GB RAM) notebook 01 runs in about 3–4 minutes and notebook 02 in about 2 minutes.
-The cross-validation uses all CPU cores (`n_jobs=-1`).
+On a laptop (8 cores, 16 GB RAM) the run times are:
+
+| Notebook | Run time |
+|---|---|
+| 01 | about 3–4 minutes |
+| 02 | about 2 minutes |
+| 03 | about 80 minutes (hyperparameter searches over all models) |
+
+The cross-validation uses all CPU cores (`n_jobs=-1`). Notebook 03 reads `results/02_first_models_cv.csv`, so
+run notebook 02 first.
