@@ -13,10 +13,12 @@ See the [main README](../README.md) for objectives and results.
 | `notebooks/02_preparation.ipynb` | Preprocessing pipelines, cross-validation protocol, dummy baseline |
 | `notebooks/03_modeling.ipynb` | Comparison and tuning of the classifiers, choice of the final model |
 | `notebooks/04_evaluation.ipynb` | Final evaluation on the held-out test part: confidence intervals, curves, lift, threshold, feature importance |
+| `notebooks/*.pdf` | PDF export of each executed notebook (A4 landscape) |
 | `src/data_utils.py` | Shared functions: load `train.csv`, recode `-1` as missing, stratified 80/20 split, feature groups |
 | `src/preprocessing.py` | Preprocessing pipelines for linear models and for tree models |
 | `src/evaluation.py` | Shared evaluation protocol: stratified 5-fold CV, Gini and PR-AUC |
 | `src/models.py` | Builds the final model from the configuration saved by notebook 03 |
+| `tools/export_pdf.py` | Exports the executed notebooks to landscape PDF files |
 | `Data/` | Place for `train.csv` (not stored in the repository, see below) |
 | `results/` | Tables, figures and the chosen model configuration written by the notebooks (e.g. `03_final_configuration.json`) |
 | `requirements.txt` | Python packages with the tested versions |
@@ -79,5 +81,14 @@ On a laptop (8 cores, 16 GB RAM) the run times are:
 | 03 | about 80 minutes (hyperparameter searches over all models) |
 | 04 | about 20 minutes |
 
-The cross-validation uses all CPU cores (`n_jobs=-1`). Notebook 03 reads `results/02_first_models_cv.csv`, so
+The cross-validation uses all CPU cores (`n_jobs=-1`).
+
+## PDF export
+
+The PDF files next to the notebooks are exports of the executed notebooks in A4 landscape format. To recreate
+them after running the notebooks (needs Microsoft Edge, Google Chrome or Chromium; no LaTeX):
+
+```bash
+python tools/export_pdf.py            # all notebooks in notebooks/
+``` Notebook 03 reads `results/02_first_models_cv.csv`, so
 run notebook 02 first; notebook 04 reads the results of notebook 03.
