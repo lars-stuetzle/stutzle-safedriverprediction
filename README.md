@@ -36,7 +36,7 @@ held-out test part (used once, for the final evaluation).
 | Step | Notebook | Status |
 |---|---|---|
 | Data understanding (EDA) | `project/notebooks/01_eda.ipynb` | done |
-| Data preparation, evaluation protocol, baseline | `project/notebooks/02_preparation.ipynb` | in progress |
+| Data preparation, evaluation protocol, baseline | `project/notebooks/02_preparation.ipynb` | done |
 | Modelling and model selection | `project/notebooks/03_modeling.ipynb` | to do |
 | Final evaluation on the test part | `project/notebooks/04_evaluation.ipynb` | to do |
 | Presentation (LaTeX Beamer) | `doc/` | to do |
@@ -53,12 +53,23 @@ held-out test part (used once, for the final evaluation).
   `ps_ind_06–09_bin` and `ps_ind_16–18_bin` are one-hot encoded hidden categorical variables.
 - No duplicates across the train/test split, so there is no leakage risk from the split.
 
-**Model comparison** (5-fold CV Gini on the training part)
+**Data preparation** (notebook 02)
+- Linear models: median imputation + missing indicators and standardization for numeric features,
+  missing as own category and one-hot encoding (rare categories grouped) for categorical features,
+  `ps_ind_14` dropped: 57 → 227 features.
+- Tree models: no imputation, scaling or encoding needed (native missing-value and categorical support).
+- All preparation steps are inside scikit-learn pipelines, refitted in every cross-validation fold (no leakage).
 
-| Model | CV Gini | CV PR-AUC |
-|---|---|---|
-| Dummy (constant claim rate) | 0.000 | 0.036 |
-| _further models: to do_ | | |
+**Model comparison** (5-fold stratified CV on the training part, mean ± std over the folds)
+
+| Model | CV Gini | CV PR-AUC | Train Gini |
+|---|---|---|---|
+| Dummy (constant claim rate) | 0.000 | 0.036 | 0.000 |
+| Logistic regression (default) | 0.257 ± 0.006 | 0.064 | 0.272 |
+| Histogram gradient boosting (default) | 0.253 ± 0.010 | 0.062 | 0.407 |
+| _tuned and further models: notebook 03_ | | | |
+
+For reference, the best Kaggle solutions reached a Gini of about 0.29 on the competition test set.
 
 ## Repository structure
 
@@ -69,7 +80,7 @@ stutzle-safedriverprediction/
 │   ├── README.md          description, prerequisites, installation and startup
 │   ├── requirements.txt
 │   ├── Data/              train.csv goes here (not in the repository, see Data/README.md)
-│   ├── src/data_utils.py  loading, recoding and splitting, shared by all notebooks
+│   ├── src/               shared code: data_utils.py (loading, split), preprocessing.py (pipelines)
 │   ├── notebooks/         01_eda, 02_preparation, ... (+ PDF exports)
 │   └── results/           tables and figures produced by the notebooks
 └── doc/                   Beamer presentation (.tex and .pdf)

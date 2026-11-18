@@ -12,8 +12,9 @@ See the [main README](../README.md) for objectives and results.
 | `notebooks/01_eda.ipynb` | Exploratory data analysis and EDA log |
 | `notebooks/02_preparation.ipynb` | Preprocessing pipelines, cross-validation protocol, dummy baseline |
 | `src/data_utils.py` | Shared functions: load `train.csv`, recode `-1` as missing, stratified 80/20 split, feature groups |
+| `src/preprocessing.py` | Preprocessing pipelines for linear models and for tree models |
 | `Data/` | Place for `train.csv` (not stored in the repository, see below) |
-| `results/` | Tables and figures written by the notebooks |
+| `results/` | Tables and figures written by the notebooks (e.g. `02_first_models_cv.csv`) |
 | `requirements.txt` | Python packages with the tested versions |
 
 Each notebook starts with a numbered workflow; its sections and code comments use the same numbers.
@@ -65,4 +66,5 @@ To execute a notebook from the command line instead:
 jupyter nbconvert --to notebook --execute --inplace notebooks/01_eda.ipynb
 ```
 
-Notebook 01 runs in about 3–4 minutes on a laptop.
+On a laptop (8 cores, 16 GB RAM) notebook 01 runs in about 3–4 minutes and notebook 02 in about 2 minutes.
+The cross-validation uses all CPU cores (`n_jobs=-1`).
