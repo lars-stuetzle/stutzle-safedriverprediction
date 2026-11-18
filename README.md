@@ -40,7 +40,7 @@ held-out test part (used once, for the final evaluation).
 | Modelling and model selection | `project/notebooks/03_modeling.ipynb` | done |
 | Final evaluation on the test part | `project/notebooks/04_evaluation.ipynb` | done |
 | Comparison on the Kaggle test set (extra) | `project/notebooks/05_kaggle_submission.ipynb` | to do |
-| Presentation (LaTeX Beamer) | `doc/` | to do |
+| Presentation (LaTeX Beamer, 18 slides + references) | `doc/presentation.pdf` | done |
 
 ## Main result
 
@@ -129,7 +129,8 @@ stutzle-safedriverprediction/
 │   │                      evaluation.py (cross-validation protocol), models.py (final model)
 │   ├── notebooks/         01_eda, 02_preparation, 03_modeling, 04_evaluation (+ PDF exports)
 │   └── results/           tables and figures produced by the notebooks
-└── doc/                   Beamer presentation (.tex and .pdf)
+└── doc/                   Beamer presentation: presentation.tex, presentation.pdf, figures/
+                           (compile with `latexmk -pdf presentation.tex` inside doc/)
 ```
 
 ## References

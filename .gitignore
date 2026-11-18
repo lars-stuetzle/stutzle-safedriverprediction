@@ -223,3 +223,14 @@ __marimo__/
 # Download it from Kaggle into project/Data/ (see project/Data/README.md).
 project/Data/*.csv
 project/Data/*.zip
+
+# LaTeX build files of the presentation (doc/)
+doc/*.aux
+doc/*.fdb_latexmk
+doc/*.fls
+doc/*.log
+doc/*.nav
+doc/*.out
+doc/*.snm
+doc/*.toc
+doc/*.synctex.gz
