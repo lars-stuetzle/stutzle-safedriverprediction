@@ -234,3 +234,6 @@ doc/*.out
 doc/*.snm
 doc/*.toc
 doc/*.synctex.gz
+
+# Kaggle submission file written by notebook 05 (about 15 MB, can be recreated)
+project/results/05_submission.csv

@@ -73,7 +73,8 @@
       \begin{itemize}
         \item Binary classification with probability output (\feat{target} = 1: claim filed)
         \item Kaggle competition (2017)
-        \item Only the Kaggle \feat{train.csv} is used (the Kaggle test set has no labels)
+        \item Model built and evaluated on \feat{train.csv} only; the unlabelled Kaggle test set is used only
+              for a late submission
       \end{itemize}
     \end{column}
     \begin{column}{0.42\textwidth}
@@ -472,12 +473,44 @@
 \end{frame}
 
 % ================================================================== 18
+\begin{frame}{Comparison with the competition (late submission)}
+  \begin{columns}[c]
+    \begin{column}{0.5\textwidth}
+      \centering\small
+      \begin{tabular}{lr}
+        \toprule
+        data & Gini \\
+        \midrule
+        our held-out test part (notebook 04) & 0.281 \\
+        Kaggle public test set ($\approx$ 30\%) & 0.273 \\
+        \textbf{Kaggle private test set ($\approx$ 70\%)} & \hl{0.279} \\
+        \midrule
+        place 100 of 5,157 teams (private) & 0.291 \\
+        winning solution (private) & 0.297 \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \small
+      \begin{itemize}
+        \item Final model refitted on \hl{all} 595,212 rows of \feat{train.csv}; Kaggle's score was \emph{not}
+              used to change the model
+        \item Private score inside our 95\% CI and 0.002 below our estimate: the held-out test part
+              \hl{predicted the real performance}
+        \item About \hl{94\%} of the winning Gini with course methods; the top teams used large
+              XGBoost/LightGBM/neural network ensembles and heavy feature engineering
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ================================================================== 19
 \begin{frame}{Conclusions}
   \begin{enumerate}
     \item Following CRISP-DM, every decision (feature removal, tuning, model choice, threshold) was made on the
           \hl{training part only}; the test part was used once
     \item Final model: \hl{soft voting} of logistic regression, random forest and gradient boosting,
-          test Gini \hl{0.281} (95\% CI 0.265 -- 0.298), in line with the CV estimate (0.274)
+          test Gini \hl{0.281} (95\% CI 0.265 -- 0.298), confirmed on Kaggle's private test set (\hl{0.279})
     \item Ensembles gave the main improvement over the baseline (0.257 $\rightarrow$ 0.281); feature removal,
           class weights and a missing-count feature did not
     \item Claims are hard to predict for one driver, but drivers can be \hl{ranked} well: a factor of 6 between
@@ -488,7 +521,7 @@
   \small
   \begin{itemize}
     \item Target encoding of the high-cardinality \feat{ps\_car\_11\_cat}; other boosting libraries (LightGBM, XGBoost)
-    \item Comparison on Kaggle's own test set with a late submission (winning private score: about 0.297)
+    \item Larger and more diverse ensembles, as used by the top Kaggle teams (gap to the winner: 0.018)
   \end{itemize}
 \end{frame}
 

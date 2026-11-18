@@ -6,4 +6,6 @@ It is not stored in the repository because it is larger than GitHub's 100 MB fil
 Download it from the competition page:
 <https://www.kaggle.com/competitions/porto-seguro-safe-driver-prediction/data>
 
-The notebooks only read this file; they never modify it.
+For the optional notebook 05 (Kaggle submission), also put the Kaggle `test.csv` here (`project/Data/test.csv`).
+
+The notebooks only read these files; they never modify them.

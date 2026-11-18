@@ -13,13 +13,14 @@ See the [main README](../README.md) for objectives and results.
 | `notebooks/02_preparation.ipynb` | Preprocessing pipelines, cross-validation protocol, dummy baseline |
 | `notebooks/03_modeling.ipynb` | Comparison and tuning of the classifiers, choice of the final model |
 | `notebooks/04_evaluation.ipynb` | Final evaluation on the held-out test part: confidence intervals, curves, lift, threshold, feature importance |
+| `notebooks/05_kaggle_submission.ipynb` | Extra: refit on all of `train.csv` and submission file for Kaggle's test set |
 | `notebooks/*.pdf` | PDF export of each executed notebook (A4 landscape) |
 | `src/data_utils.py` | Shared functions: load `train.csv`, recode `-1` as missing, stratified 80/20 split, feature groups |
 | `src/preprocessing.py` | Preprocessing pipelines for linear models and for tree models |
 | `src/evaluation.py` | Shared evaluation protocol: stratified 5-fold CV, Gini and PR-AUC |
 | `src/models.py` | Builds the final model from the configuration saved by notebook 03 |
 | `tools/export_pdf.py` | Exports the executed notebooks to landscape PDF files |
-| `Data/` | Place for `train.csv` (not stored in the repository, see below) |
+| `Data/` | Place for `train.csv` and, for notebook 05, `test.csv` (not stored in the repository, see below) |
 | `results/` | Tables, figures and the chosen model configuration written by the notebooks (e.g. `03_final_configuration.json`) |
 | `requirements.txt` | Python packages with the tested versions |
 
@@ -54,7 +55,9 @@ The data file is too large for GitHub (about 110 MB), so it is not part of the r
    `kaggle competitions download -c porto-seguro-safe-driver-prediction -f train.csv`).
 3. Put it in `project/Data/train.csv` (unzip it if necessary).
 
-Only `train.csv` is used. The Kaggle `test.csv` has no target and is therefore not part of this project.
+Only `train.csv` is used to build and evaluate the model. The Kaggle `test.csv` has no target; it is needed only
+for the optional notebook 05, which creates a submission file for the competition. To run it, download `test.csv`
+from the same page into `project/Data/test.csv`.
 
 ## Startup
 
@@ -80,6 +83,7 @@ On a laptop (8 cores, 16 GB RAM) the run times are:
 | 02 | about 2 minutes |
 | 03 | about 80 minutes (hyperparameter searches over all models) |
 | 04 | about 20 minutes |
+| 05 | about 5 minutes |
 
 The cross-validation uses all CPU cores (`n_jobs=-1`).
 

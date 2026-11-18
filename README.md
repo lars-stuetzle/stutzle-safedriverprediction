@@ -17,7 +17,8 @@ claim in the next year. Better estimates allow fairer prices: safe drivers pay l
 - **Metric:** normalised Gini coefficient (= 2·AUC − 1), the official competition metric; the PR-AUC is
   reported as well.
 
-As required by the course, only the Kaggle `train.csv` is used (the Kaggle `test.csv` has no target).
+As required by the course, only the Kaggle `train.csv` is used to build and evaluate the model (the Kaggle
+`test.csv` has no target; it is used only in notebook 05 to create a submission for the competition).
 It is split into a stratified 80% training part (model selection with 5-fold cross-validation) and a 20%
 held-out test part (used once, for the final evaluation).
 
@@ -39,8 +40,8 @@ held-out test part (used once, for the final evaluation).
 | Data preparation, evaluation protocol, baseline | `project/notebooks/02_preparation.ipynb` | done |
 | Modelling and model selection | `project/notebooks/03_modeling.ipynb` | done |
 | Final evaluation on the test part | `project/notebooks/04_evaluation.ipynb` | done |
-| Comparison on the Kaggle test set (extra) | `project/notebooks/05_kaggle_submission.ipynb` | to do |
-| Presentation (LaTeX Beamer, 18 slides + references) | `doc/presentation.pdf` | done |
+| Comparison on the Kaggle test set (extra) | `project/notebooks/05_kaggle_submission.ipynb` | done |
+| Presentation (LaTeX Beamer, 19 slides + references) | `doc/presentation.pdf` | done |
 
 ## Main result
 
@@ -48,6 +49,10 @@ The final model, a **soft voting ensemble of logistic regression, random forest 
 reaches a **Gini of 0.281 (95% bootstrap CI 0.265 – 0.298)** on the held-out test part (119,043 drivers that were
 not used for any decision). The 10% riskiest drivers claim 6 times as often as the 10% safest (8.1% vs 1.3%),
 and the predicted probabilities are well calibrated, so the model is suitable as a risk score for pricing.
+
+A late submission to the Kaggle competition (model refitted on all of `train.csv`) scores **0.279 on Kaggle's
+private test set**, inside our confidence interval. The winning solution reached 0.297, so the model achieves
+about 94% of the winning Gini with the standard methods of the course.
 
 ## Results
 
@@ -113,8 +118,22 @@ and the predicted probabilities are well calibrated, so the model is suitable as
 - Most important features (permutation importance): `ps_ind_05_cat`, `ps_car_13`, `ps_car_01_cat`,
   `ps_ind_06_bin`, `ps_reg_03`.
 
-For reference, the winning Kaggle solutions reached a Gini of about 0.297 on Kaggle's private test set. That
-number comes from different data; a direct comparison is planned with a late submission (notebook 05).
+**Comparison with the competition** (notebook 05, late submission, final model refitted on all 595,212 rows)
+
+| Data | Gini |
+|---|---|
+| Our held-out test part (notebook 04) | 0.281 (95% CI 0.265 – 0.298) |
+| Kaggle public test set (about 30%) | 0.273 |
+| **Kaggle private test set (about 70%, final ranking)** | **0.279** |
+| Place 100 of 5,157 teams (private) | 0.291 |
+| Winning solution (private) | 0.297 |
+
+- The private score lies inside our confidence interval and 0.002 below the estimate of notebook 04: the
+  held-out test part predicted the performance on new drivers very well.
+- Kaggle's test set has the same distribution as `train.csv` (missing-value shares and feature means agree).
+- The gap to the top comes from the methods, not the amount of data: the winning teams used large ensembles of
+  XGBoost/LightGBM and neural networks, extensive feature engineering and many leaderboard submissions; this
+  project used the methods of the course and tuned only on its training part.
 
 ## Repository structure
 
@@ -124,10 +143,11 @@ stutzle-safedriverprediction/
 ├── project/               software and data
 │   ├── README.md          description, prerequisites, installation and startup
 │   ├── requirements.txt
-│   ├── Data/              train.csv goes here (not in the repository, see Data/README.md)
+│   ├── Data/              train.csv (and test.csv for notebook 05) go here (not in the repository)
 │   ├── src/               shared code: data_utils.py (loading, split), preprocessing.py (pipelines),
 │   │                      evaluation.py (cross-validation protocol), models.py (final model)
-│   ├── notebooks/         01_eda, 02_preparation, 03_modeling, 04_evaluation (+ PDF exports)
+│   ├── notebooks/         01_eda, 02_preparation, 03_modeling, 04_evaluation, 05_kaggle_submission
+│   │                      (+ PDF exports)
 │   └── results/           tables and figures produced by the notebooks
 └── doc/                   Beamer presentation: presentation.tex, presentation.pdf, figures/
                            (compile with `latexmk -pdf presentation.tex` inside doc/)
