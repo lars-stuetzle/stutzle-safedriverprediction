@@ -218,3 +218,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project data: train.csv (~110 MB) exceeds GitHub's 100 MB file limit.
+# Download it from Kaggle into project/Data/ (see project/Data/README.md).
+project/Data/*.csv
+project/Data/*.zip
