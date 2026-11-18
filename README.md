@@ -38,10 +38,18 @@ held-out test part (used once, for the final evaluation).
 | Data understanding (EDA) | `project/notebooks/01_eda.ipynb` | done |
 | Data preparation, evaluation protocol, baseline | `project/notebooks/02_preparation.ipynb` | done |
 | Modelling and model selection | `project/notebooks/03_modeling.ipynb` | done |
-| Final evaluation on the test part | `project/notebooks/04_evaluation.ipynb` | to do |
+| Final evaluation on the test part | `project/notebooks/04_evaluation.ipynb` | done |
+| Comparison on the Kaggle test set (extra) | `project/notebooks/05_kaggle_submission.ipynb` | to do |
 | Presentation (LaTeX Beamer) | `doc/` | to do |
 
-## Results so far
+## Main result
+
+The final model, a **soft voting ensemble of logistic regression, random forest and gradient boosting**,
+reaches a **Gini of 0.281 (95% bootstrap CI 0.265 – 0.298)** on the held-out test part (119,043 drivers that were
+not used for any decision). The 10% riskiest drivers claim 6 times as often as the 10% safest (8.1% vs 1.3%),
+and the predicted probabilities are well calibrated, so the model is suitable as a risk score for pricing.
+
+## Results
 
 **Exploratory data analysis** (notebook 01)
 - Missing values are informative: depending on the column, the claim rate among missing rows is
@@ -85,9 +93,28 @@ held-out test part (used once, for the final evaluation).
 | Gaussian Naive Bayes | 0.179 ± 0.007 | 0.049 | 0.196 |
 | Dummy (constant claim rate) | 0.000 | 0.036 | 0.000 |
 
-The scores of tuned models are slightly optimistic (the same folds chose the hyperparameters); the unbiased
-estimate comes from the held-out test part in notebook 04. For reference, the best Kaggle solutions reached a
-Gini of about 0.29 on the competition test set (different data, so not directly comparable).
+**Final evaluation** (notebook 04, held-out test part, model refitted on the whole training part)
+
+| Model | CV Gini | Test Gini (95% CI) | Test PR-AUC |
+|---|---|---|---|
+| **Soft voting (LR + RF + GB)** | 0.274 | **0.281 (0.265 – 0.298)** | **0.068** |
+| Histogram gradient boosting (tuned) | 0.266 | 0.278 (0.261 – 0.295) | 0.067 |
+| Random forest (tuned) | 0.270 | 0.271 (0.254 – 0.288) | 0.065 |
+| Logistic regression (tuned) | 0.259 | 0.267 (0.250 – 0.284) | 0.065 |
+| Dummy | 0.000 | 0.000 | 0.036 |
+
+- The test scores agree with the cross-validation estimates, so the evaluation protocol did not overfit.
+- On the same test drivers (paired bootstrap), the ensemble beats the random forest and the logistic
+  regression in all 1,000 resamples, and gradient boosting in 94%.
+- Lift: the riskiest 10% of drivers account for 22% of all claims, the riskiest 30% for 49%.
+- Threshold 0.5 flags nobody (accuracy 96.4% = always "no claim"). Flagging the riskiest 10% gives a precision of
+  8.0% (2.2× the claim rate) and a recall of 22%: claims cannot be predicted for a single driver, but drivers can
+  be ranked well.
+- Most important features (permutation importance): `ps_ind_05_cat`, `ps_car_13`, `ps_car_01_cat`,
+  `ps_ind_06_bin`, `ps_reg_03`.
+
+For reference, the winning Kaggle solutions reached a Gini of about 0.297 on Kaggle's private test set. That
+number comes from different data; a direct comparison is planned with a late submission (notebook 05).
 
 ## Repository structure
 
@@ -99,8 +126,8 @@ stutzle-safedriverprediction/
 │   ├── requirements.txt
 │   ├── Data/              train.csv goes here (not in the repository, see Data/README.md)
 │   ├── src/               shared code: data_utils.py (loading, split), preprocessing.py (pipelines),
-│   │                      evaluation.py (cross-validation protocol)
-│   ├── notebooks/         01_eda, 02_preparation, 03_modeling, ... (+ PDF exports)
+│   │                      evaluation.py (cross-validation protocol), models.py (final model)
+│   ├── notebooks/         01_eda, 02_preparation, 03_modeling, 04_evaluation (+ PDF exports)
 │   └── results/           tables and figures produced by the notebooks
 └── doc/                   Beamer presentation (.tex and .pdf)
 ```
